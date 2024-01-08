@@ -13,4 +13,3 @@ license: mit
 # gradio-chatgpt
 An implementation of ChatGPT via Gradio Interface
 
-Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference

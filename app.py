@@ -1,5 +1,3 @@
-import os
-import time
 import gradio as gr
 from openai import OpenAI
 
@@ -44,36 +42,34 @@ def run_chatbot(gpt):
     with gr.Blocks() as chatbot:
 
         # parameters accordion
-        info = gr.Markdown('For additional parameters see [OpenAI Chat API Reference]' \
-                           + '(https://platform.openai.com/docs/api-reference/chat)',
-                           render=False)
-        system_prompt = gr.Textbox('You are a helpful assistant.', label='system prompt', render=False)
-        temperature = gr.Slider(0., 2., value=1., step=.1, label='temperature', render=False)
-        top_p = gr.Slider(0., 1., value=1., step=.01, label='top_p', render=False)
-        frequency_penalty = gr.Slider(-2., 2., value=0, step=.1, label='frequency_penalty', render=False)
-        presence_penalty = gr.Slider(-2., 2., value=0, step=.1, label='presence_penalty', render=False)
+        with gr.Accordion(label='GPT Parameters', open=False) as parameters:
+            info = gr.Markdown('For parameter documentation see [OpenAI Chat API Reference]' \
+                               + '(https://platform.openai.com/docs/api-reference/chat)')
+            system_prompt = gr.Textbox('You are a helpful assistant.', label='system prompt')
+            with gr.Row():
+                temperature = gr.Slider(0., 2., value=1., step=.1, label='temperature')
+                top_p = gr.Slider(0., 1., value=1., step=.01, label='top_p')
+            # with gr.Row():
+                frequency_penalty = gr.Slider(-2., 2., value=0, step=.1, label='frequency_penalty')
+                presence_penalty = gr.Slider(-2., 2., value=0, step=.1, label='presence_penalty')
 
         # chatbot interface
         gr.ChatInterface(
             fn=gpt.chat,
-            title='ChatGPT',
-            description='A simple implementation of ChatGPT',
             chatbot=gr.Chatbot(height=600, layout='bubble', label='ChatGPT', render=False),
             textbox=gr.Textbox(placeholder='Message ChatGPT...', scale=9, render=False),
-            additional_inputs_accordion=gr.Accordion(label='Parameters', open=False, render=False),
-            additional_inputs=[info, system_prompt,
-                               temperature, top_p,
-                               frequency_penalty, presence_penalty],
+            additional_inputs_accordion=parameters,
+            additional_inputs=[info, system_prompt, temperature, top_p, frequency_penalty, presence_penalty],
             retry_btn=None,
             undo_btn=None,
             clear_btn=None,
             concurrency_limit=None,
             theme=None,
         )
+
     chatbot.launch()
 
 
 if __name__ == '__main__':
-
     gpt = GPT()
     run_chatbot(gpt)

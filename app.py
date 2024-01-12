@@ -47,11 +47,10 @@ def run_chatbot(gpt):
                                + '(https://platform.openai.com/docs/api-reference/chat)')
             system_prompt = gr.Textbox('You are a helpful assistant.', label='system prompt')
             with gr.Row():
-                temperature = gr.Slider(0., 2., value=1., step=.1, label='temperature')
-                top_p = gr.Slider(0., 1., value=1., step=.01, label='top_p')
-            # with gr.Row():
-                frequency_penalty = gr.Slider(-2., 2., value=0, step=.1, label='frequency_penalty')
-                presence_penalty = gr.Slider(-2., 2., value=0, step=.1, label='presence_penalty')
+                temperature = gr.Slider(0., 2., value=1., step=.1, min_width=200, label='temperature')
+                top_p = gr.Slider(0., 1., value=1., step=.01, min_width=200, label='top_p')
+                frequency_penalty = gr.Slider(-2., 2., value=0, step=.1, min_width=200, label='frequency_penalty')
+                presence_penalty = gr.Slider(-2., 2., value=0, step=.1, min_width=200, label='presence_penalty')
 
         # chatbot interface
         gr.ChatInterface(

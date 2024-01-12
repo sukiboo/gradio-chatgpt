@@ -55,7 +55,7 @@ def run_chatbot(gpt):
         # chatbot interface
         gr.ChatInterface(
             fn=gpt.chat,
-            chatbot=gr.Chatbot(height=600, layout='bubble', label='ChatGPT', render=False),
+            chatbot=gr.Chatbot(height=500, layout='bubble', label='ChatGPT', render=False),
             textbox=gr.Textbox(placeholder='Message ChatGPT...', scale=9, render=False),
             additional_inputs_accordion=parameters,
             additional_inputs=[info, system_prompt, temperature, top_p, frequency_penalty, presence_penalty],

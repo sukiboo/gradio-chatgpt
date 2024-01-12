@@ -11,11 +11,11 @@ class GPT:
         self.params = {'model': 'gpt-3.5-turbo', **params}
         self.messages = []
 
-    def chat(self, user_prompt, history=[], *params):
-        """Update model parameters and generate a response."""
-        _, system_prompt, temperature, top_p, frequency_penalty, presence_penalty = params
+    def chat(self, user_prompt, chat_history, system_prompt, *params):
+        """Generate a response with a given parameters."""
 
-        # update the parameters
+        # update GPT parameters
+        temperature, top_p, frequency_penalty, presence_penalty = params
         self.params['temperature'] = temperature
         self.params['top_p'] = top_p
         self.params['frequency_penalty'] = frequency_penalty
@@ -23,7 +23,7 @@ class GPT:
 
         # update the message buffer
         self.messages = [{'role': 'system', 'content': f'{system_prompt}'}]
-        for prompt, response in history:
+        for prompt, response in chat_history:
             self.messages.append({'role': 'user', 'content': f'{prompt}'})
             self.messages.append({'role': 'assistant', 'content': f'{response}'})
         self.messages.append({'role': 'user', 'content': f'{user_prompt}'})
@@ -32,17 +32,23 @@ class GPT:
         completion = self.client.chat.completions.create(messages=self.messages, **self.params)
         response = completion.choices[0].message.content
         self.messages.append({'role': 'assistant', 'content': response})
+        chat_history.append((user_prompt, response))
 
-        return response
+        return '', chat_history
 
 
 def run_chatbot(gpt):
     """Configure and launch the chatbot interface."""
-    gr.close_all()
-    with gr.Blocks() as chatbot:
+    with gr.Blocks(title='ChatGPT') as chatbot:
+
+        # chatbot interface
+        chat_history = gr.Chatbot(height=500, layout='bubble', label='ChatGPT')
+        with gr.Row():
+            user_prompt = gr.Textbox(placeholder='Message ChatGPT...', container=False, scale=9)
+            submit_button = gr.Button('Submit')
 
         # parameters accordion
-        with gr.Accordion(label='GPT Parameters', open=False) as parameters:
+        with gr.Accordion(label='GPT Parameters', open=False):
             info = gr.Markdown('For parameter documentation see [OpenAI Chat API Reference]' \
                                + '(https://platform.openai.com/docs/api-reference/chat)')
             system_prompt = gr.Textbox('You are a helpful assistant.', label='system prompt')
@@ -52,20 +58,19 @@ def run_chatbot(gpt):
                 frequency_penalty = gr.Slider(-2., 2., value=0, step=.1, min_width=200, label='frequency_penalty')
                 presence_penalty = gr.Slider(-2., 2., value=0, step=.1, min_width=200, label='presence_penalty')
 
-        # chatbot interface
-        gr.ChatInterface(
-            fn=gpt.chat,
-            chatbot=gr.Chatbot(height=500, layout='bubble', label='ChatGPT', render=False),
-            textbox=gr.Textbox(placeholder='Message ChatGPT...', scale=9, render=False),
-            additional_inputs_accordion=parameters,
-            additional_inputs=[info, system_prompt, temperature, top_p, frequency_penalty, presence_penalty],
-            retry_btn=None,
-            undo_btn=None,
-            clear_btn=None,
-            concurrency_limit=None,
-            theme=None,
-        )
+        # submit user prompt
+        submit_button.click(gpt.chat,
+                            inputs=[user_prompt, chat_history, system_prompt,
+                                    temperature, top_p, frequency_penalty, presence_penalty],
+                            outputs=[user_prompt, chat_history])
+        user_prompt.submit(gpt.chat,
+                           inputs=[user_prompt, chat_history, system_prompt,
+                                   temperature, top_p, frequency_penalty, presence_penalty],
+                           outputs=[user_prompt, chat_history])
 
+    # instantiate the chatbot
+    gr.close_all()
+    chatbot.queue(default_concurrency_limit=None)
     chatbot.launch()
 
 

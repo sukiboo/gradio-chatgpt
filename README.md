@@ -1,7 +1,7 @@
 ---
 title: Gradio Chatgpt
 emoji: 🐱
-colorFrom: red
+colorFrom: gray
 colorTo: gray
 sdk: gradio
 sdk_version: 4.13.0

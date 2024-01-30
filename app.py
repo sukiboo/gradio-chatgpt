@@ -59,14 +59,11 @@ def run_chatbot(gpt):
                 presence_penalty = gr.Slider(-2., 2., value=0, step=.1, min_width=200, label='presence_penalty')
 
         # submit user prompt
-        submit_button.click(gpt.chat,
-                            inputs=[user_prompt, chat_history, system_prompt,
-                                    temperature, top_p, frequency_penalty, presence_penalty],
-                            outputs=[user_prompt, chat_history])
-        user_prompt.submit(gpt.chat,
-                           inputs=[user_prompt, chat_history, system_prompt,
-                                   temperature, top_p, frequency_penalty, presence_penalty],
-                           outputs=[user_prompt, chat_history])
+        inputs = [user_prompt, chat_history, system_prompt,
+                  temperature, top_p, frequency_penalty, presence_penalty]
+        outputs = [user_prompt, chat_history]
+        submit_button.click(gpt.chat, inputs=inputs, outputs=outputs)
+        user_prompt.submit(gpt.chat, inputs=inputs, outputs=outputs)
 
     # instantiate the chatbot
     gr.close_all()

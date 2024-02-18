@@ -44,7 +44,7 @@ def run_chatbot(gpt):
         # chatbot interface
         chat_history = gr.Chatbot(height=500, layout='bubble', label='ChatGPT')
         with gr.Row():
-            user_prompt = gr.Textbox(placeholder='Message ChatGPT...', container=False, scale=9)
+            user_prompt = gr.Textbox(placeholder='Message ChatGPT...', container=False, min_width=500, scale=9)
             submit_button = gr.Button('Submit')
 
         # parameters accordion
